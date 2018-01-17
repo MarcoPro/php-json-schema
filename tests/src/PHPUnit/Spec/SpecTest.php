@@ -166,7 +166,6 @@ class SpecTest extends \PHPUnit_Framework_TestCase
         } catch (InvalidValue $exception) {
             $actualValid = false;
             $error = $exception->getMessage();
-            throw $exception;
         }
 
 
