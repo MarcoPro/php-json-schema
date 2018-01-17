@@ -10,9 +10,6 @@ use Swaggest\JsonSchema\SchemaDraft6;
 
 class SpecTest extends \PHPUnit_Framework_TestCase
 {
-    const DRAFT_04 = 4;
-    const DRAFT_06 = 6;
-
     public static function getProvider()
     {
         static $refProvider = null;
@@ -50,7 +47,7 @@ class SpecTest extends \PHPUnit_Framework_TestCase
      */
     public function testSpecDraft4($schemaData, $data, $isValid)
     {
-        $this->runSpecTest($schemaData, $data, $isValid, self::DRAFT_04);
+        $this->runSpecTest($schemaData, $data, $isValid, Schema::VERSION_DRAFT_04);
     }
 
     /**
@@ -62,8 +59,21 @@ class SpecTest extends \PHPUnit_Framework_TestCase
      */
     public function testSpecDraft6($schemaData, $data, $isValid)
     {
-        $this->runSpecTest($schemaData, $data, $isValid, self::DRAFT_06);
+        $this->runSpecTest($schemaData, $data, $isValid, Schema::VERSION_DRAFT_06);
     }
+
+    /**
+     * @dataProvider spec7Provider
+     * @param $schemaData
+     * @param $data
+     * @param $isValid
+     * @throws \Exception
+     */
+    public function testSpecDraft7($schemaData, $data, $isValid)
+    {
+        $this->runSpecTest($schemaData, $data, $isValid, Schema::VERSION_DRAFT_07);
+    }
+
 
     /**
      * @param $schemaData
@@ -81,11 +91,11 @@ class SpecTest extends \PHPUnit_Framework_TestCase
         try {
             $options = new Context();
             $options->setRemoteRefProvider($refProvider);
+            $options->version = $version;
 
             $schema = Schema::import($schemaData, $options);
 
             $res = $schema->in($data);
-
 
             $exported = $schema->out($res);
             $this->assertEquals($data, $exported);
@@ -119,6 +129,17 @@ class SpecTest extends \PHPUnit_Framework_TestCase
      * @param $isValid
      */
     public function testSpecDraft6SkipValidation($schemaData, $data, $isValid)
+    {
+        $this->runSpecTestSkipValidation($schemaData, $data, $isValid);
+    }
+
+    /**
+     * @dataProvider spec7Provider
+     * @param $schemaData
+     * @param $data
+     * @param $isValid
+     */
+    public function testSpecDraft7SkipValidation($schemaData, $data, $isValid)
     {
         $this->runSpecTestSkipValidation($schemaData, $data, $isValid);
     }
@@ -164,6 +185,12 @@ class SpecTest extends \PHPUnit_Framework_TestCase
     public function spec6Provider()
     {
         $path = __DIR__ . '/../../../../spec/JSON-Schema-Test-Suite/tests/draft6';
+        return $this->provider($path);
+    }
+
+    public function spec7Provider()
+    {
+        $path = __DIR__ . '/../../../../spec/JSON-Schema-Test-Suite/tests/draft7';
         return $this->provider($path);
     }
 

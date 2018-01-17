@@ -142,6 +142,16 @@ class JsonSchema extends ClassStructure {
     /** @var JsonSchema */
     public $propertyNames;
 
+    // draft7
+    /** @var JsonSchema */
+    public $if;
+
+    /** @var JsonSchema */
+    public $then;
+
+    /** @var JsonSchema */
+    public $else;
+
 	/**
 	 * @param Properties|static $properties
 	 * @param JsonBasicSchema $ownerSchema
@@ -299,6 +309,11 @@ class JsonSchema extends ClassStructure {
         $properties->const = (object)array();
         $properties->contains = JsonBasicSchema::schema();
         $properties->propertyNames = JsonBasicSchema::schema();
+
+        // draft7
+        $properties->if = JsonBasicSchema::schema();
+        $properties->then = JsonBasicSchema::schema();
+        $properties->else = JsonBasicSchema::schema();
     }
 
 	/**

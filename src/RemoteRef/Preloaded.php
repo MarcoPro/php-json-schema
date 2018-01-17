@@ -14,6 +14,8 @@ class Preloaded implements RemoteRefProvider
             json_decode(file_get_contents(__DIR__ . '/../../spec/json-schema.json')));
         $this->setSchemaData('http://json-schema.org/draft-06/schema',
             json_decode(file_get_contents(__DIR__ . '/../../spec/json-schema-draft6.json')));
+        $this->setSchemaData('http://json-schema.org/draft-07/schema',
+            json_decode(file_get_contents(__DIR__ . '/../../spec/json-schema-draft7.json')));
     }
 
     public function getSchemaData($url)

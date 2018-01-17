@@ -36,6 +36,7 @@ class Schema extends JsonSchema implements MetaHolder
     const VERSION_AUTO = 'a';
     const VERSION_DRAFT_04 = 4;
     const VERSION_DRAFT_06 = 6;
+    const VERSION_DRAFT_07 = 7;
 
     const SCHEMA_DRAFT_04_URL = 'http://json-schema.org/draft-04/schema';
 
@@ -81,6 +82,14 @@ class Schema extends JsonSchema implements MetaHolder
     public $anyOf;
     /** @var Schema[] */
     public $oneOf;
+
+    /** @var Schema */
+    public $if;
+    /** @var Schema */
+    public $then;
+    /** @var Schema */
+    public $else;
+
 
     public $objectItemClass;
     private $useObjectAsArray = false;
@@ -420,6 +429,24 @@ class Schema extends JsonSchema implements MetaHolder
         if ($this->allOf !== null) {
             foreach ($this->allOf as $index => $item) {
                 $result = self::unboolSchema($item)->process($data, $options, $path . '->allOf' . $index);
+            }
+        }
+
+        if ($this->if !== null) {
+            $valid = true;
+            try {
+                self::unboolSchema($this->if)->process($data, $options, $path . '->if');
+            } catch (InvalidValue $exception) {
+                $valid = false;
+            }
+            if ($valid) {
+                if ($this->then !== null) {
+                    $result = self::unboolSchema($this->then)->process($data, $options, $path . '->then');
+                }
+            } else {
+                if ($this->else !== null) {
+                    $result = self::unboolSchema($this->else)->process($data, $options, $path . '->else');
+                }
             }
         }
 

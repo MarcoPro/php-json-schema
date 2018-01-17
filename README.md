@@ -8,6 +8,7 @@
 High definition PHP structures with JSON-schema based validation.
 
 Supported schemas:
+[JSON Schema Draft 7](http://json-schema.org/specification-links.html#draft-7)
 [JSON Schema Draft 6](http://json-schema.org/specification-links.html#draft-6)
 [JSON Schema Draft 4](http://json-schema.org/specification-links.html#draft-4)
 
