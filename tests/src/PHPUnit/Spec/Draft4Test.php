@@ -6,10 +6,14 @@ use Swaggest\JsonSchema\Context;
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\RemoteRef\Preloaded;
 use Swaggest\JsonSchema\Schema;
-use Swaggest\JsonSchema\SchemaDraft6;
 
-class SpecTest extends \PHPUnit_Framework_TestCase
+class Draft4Test extends \PHPUnit_Framework_TestCase
 {
+    const SCHEMA_VERSION = Schema::VERSION_DRAFT_04;
+
+    protected $skipTests = array();
+    protected $ignoreTests = array();
+
     public static function getProvider()
     {
         static $refProvider = null;
@@ -39,50 +43,44 @@ class SpecTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider spec4Provider
+     * @dataProvider specProvider
      * @param $schemaData
      * @param $data
      * @param $isValid
+     * @param $name
      * @throws \Exception
      */
-    public function testSpecDraft4($schemaData, $data, $isValid)
+    public function testSpec($schemaData, $data, $isValid, $name)
     {
-        $this->runSpecTest($schemaData, $data, $isValid, Schema::VERSION_DRAFT_04);
+        if (isset($this->skipTests[$name])) {
+            $this->markTestSkipped();
+            return;
+        }
+        $this->runSpecTest($schemaData, $data, $isValid, $name, static::SCHEMA_VERSION);
     }
 
     /**
-     * @dataProvider spec6Provider
+     * @dataProvider specOptionalProvider
      * @param $schemaData
      * @param $data
      * @param $isValid
+     * @param $name
      * @throws \Exception
      */
-    public function testSpecDraft6($schemaData, $data, $isValid)
+    public function testSpecOptional($schemaData, $data, $isValid, $name)
     {
-        $this->runSpecTest($schemaData, $data, $isValid, Schema::VERSION_DRAFT_06);
+        $this->runSpecTest($schemaData, $data, $isValid, $name, static::SCHEMA_VERSION);
     }
 
     /**
-     * @dataProvider spec7Provider
      * @param $schemaData
      * @param $data
      * @param $isValid
-     * @throws \Exception
-     */
-    public function testSpecDraft7($schemaData, $data, $isValid)
-    {
-        $this->runSpecTest($schemaData, $data, $isValid, Schema::VERSION_DRAFT_07);
-    }
-
-
-    /**
-     * @param $schemaData
-     * @param $data
-     * @param $isValid
+     * @param $name
      * @param $version
      * @throws \Exception
      */
-    private function runSpecTest($schemaData, $data, $isValid, $version)
+    protected function runSpecTest($schemaData, $data, $isValid, $name, $version)
     {
         $refProvider = self::getProvider();
 
@@ -95,7 +93,7 @@ class SpecTest extends \PHPUnit_Framework_TestCase
 
             $schema = Schema::import($schemaData, $options);
 
-            $res = $schema->in($data);
+            $res = $schema->in($data, $options);
 
             $exported = $schema->out($res);
             $this->assertEquals($data, $exported);
@@ -105,47 +103,25 @@ class SpecTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertSame($isValid, $actualValid, "Schema:\n" . json_encode($schemaData, JSON_PRETTY_PRINT)
-            . "\nData:\n" . json_encode($data, JSON_PRETTY_PRINT)
+            . "\nData:\n" . json_encode($data, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES)
             . "\nError: " . $error . "\n");
 
     }
 
 
     /**
-     * @dataProvider spec4Provider
+     * @dataProvider specProvider
      * @param $schemaData
      * @param $data
      * @param $isValid
+     * @param $name
      */
-    public function testSpecDraft4SkipValidation($schemaData, $data, $isValid)
+    public function testSpecSkipValidation($schemaData, $data, $isValid, $name)
     {
-        $this->runSpecTestSkipValidation($schemaData, $data, $isValid);
+        $this->runSpecTestSkipValidation($schemaData, $data, $isValid, $name);
     }
 
-    /**
-     * @dataProvider spec6Provider
-     * @param $schemaData
-     * @param $data
-     * @param $isValid
-     */
-    public function testSpecDraft6SkipValidation($schemaData, $data, $isValid)
-    {
-        $this->runSpecTestSkipValidation($schemaData, $data, $isValid);
-    }
-
-    /**
-     * @dataProvider spec7Provider
-     * @param $schemaData
-     * @param $data
-     * @param $isValid
-     */
-    public function testSpecDraft7SkipValidation($schemaData, $data, $isValid)
-    {
-        $this->runSpecTestSkipValidation($schemaData, $data, $isValid);
-    }
-
-
-    private function runSpecTestSkipValidation($schemaData, $data, $isValid)
+    private function runSpecTestSkipValidation($schemaData, $data, $isValid, $name)
     {
         $refProvider = self::getProvider();
 
@@ -174,26 +150,19 @@ class SpecTest extends \PHPUnit_Framework_TestCase
             . "\nError: " . $error . "\n");
     }
 
+    public function specOptionalProvider()
+    {
+        $path = __DIR__ . '/../../../../spec/JSON-Schema-Test-Suite/tests/draft4/optional';
+        return $this->provider($path);
+    }
 
-    public function spec4Provider()
+    public function specProvider()
     {
         $path = __DIR__ . '/../../../../spec/JSON-Schema-Test-Suite/tests/draft4';
         return $this->provider($path);
     }
 
-    public function spec6Provider()
-    {
-        $path = __DIR__ . '/../../../../spec/JSON-Schema-Test-Suite/tests/draft6';
-        return $this->provider($path);
-    }
-
-    public function spec7Provider()
-    {
-        $path = __DIR__ . '/../../../../spec/JSON-Schema-Test-Suite/tests/draft7';
-        return $this->provider($path);
-    }
-
-    public function provider($path)
+    protected function provider($path)
     {
         if (!file_exists($path)) {
             //$this->markTestSkipped('No spec tests found, please run `git submodule bla-bla`');
@@ -214,7 +183,9 @@ class SpecTest extends \PHPUnit_Framework_TestCase
 
                     //echo "$entry\n";
                     /** @var _SpecTest[] $tests */
+//                    $tests = json_decode(file_get_contents($path . '/' . $entry), false, 512, JSON_BIGINT_AS_STRING);
                     $tests = json_decode(file_get_contents($path . '/' . $entry));
+
                     foreach ($tests as $test) {
                         foreach ($test->tests as $case) {
                             /*if ($case->description !== 'changed scope ref invalid') {
@@ -222,10 +193,12 @@ class SpecTest extends \PHPUnit_Framework_TestCase
                             }
                             */
 
-                            $testCases[$entry . ' ' . $test->description . ': ' . $case->description] = array(
+                            $name = $entry . ' ' . $test->description . ': ' . $case->description;
+                            $testCases[$name] = array(
                                 'schema' => $test->schema,
                                 'data' => $case->data,
                                 'isValid' => $case->valid,
+                                'name' => $name,
                             );
                         }
                     }

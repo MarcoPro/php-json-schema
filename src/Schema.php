@@ -5,6 +5,7 @@ namespace Swaggest\JsonSchema;
 
 use PhpLang\ScopeExit;
 use Swaggest\JsonDiff\JsonDiff;
+use Swaggest\JsonSchema\Constraint\Format;
 use Swaggest\JsonSchema\Constraint\Properties;
 use Swaggest\JsonSchema\Constraint\Type;
 use Swaggest\JsonSchema\Constraint\UniqueItems;
@@ -178,6 +179,7 @@ class Schema extends JsonSchema implements MetaHolder
      * @param Context|null $options
      * @return array|mixed|null|object|\stdClass
      * @throws InvalidValue
+     * @throws \Exception
      */
     public function out($data, Context $options = null)
     {
@@ -240,7 +242,7 @@ class Schema extends JsonSchema implements MetaHolder
             if ($options->tolerateStrings && is_string($data)) {
                 $valid = Type::readString($this->type, $data);
             } else {
-                $valid = Type::isValid($this->type, $data);
+                $valid = Type::isValid($this->type, $data, $options->version);
             }
             if (!$valid) {
                 $this->fail(new TypeException(ucfirst(
@@ -305,6 +307,16 @@ class Schema extends JsonSchema implements MetaHolder
                 if (0 === preg_match(Helper::toPregPattern($this->pattern), $data)) {
                     $this->fail(new StringException(json_encode($data) . ' does not match to '
                         . $this->pattern, StringException::PATTERN_MISMATCH), $path);
+                }
+            }
+            if ($this->format !== null) {
+                $validationError = Format::validationError($this->format, $data);
+                if ($validationError !== null) {
+                    if ($this->format === "uri" && substr($path, -3) === ':id') {
+                        //echo 'A';
+                    } else {
+                        $this->fail(new StringException($validationError), $path);
+                    }
                 }
             }
         }
