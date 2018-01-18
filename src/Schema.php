@@ -5,6 +5,7 @@ namespace Swaggest\JsonSchema;
 
 use PhpLang\ScopeExit;
 use Swaggest\JsonDiff\JsonDiff;
+use Swaggest\JsonSchema\Constraint\Content;
 use Swaggest\JsonSchema\Constraint\Format;
 use Swaggest\JsonSchema\Constraint\Properties;
 use Swaggest\JsonSchema\Constraint\Type;
@@ -317,6 +318,14 @@ class Schema extends JsonSchema implements MetaHolder
                     } else {
                         $this->fail(new StringException($validationError), $path);
                     }
+                }
+            }
+            // TODO enable content decoding/encoding with import/export
+            if ($this->contentEncoding !== null || $this->contentMediaType !== null) {
+                try {
+                    Content::process($options, $this->contentEncoding, $this->contentMediaType, $data, true);
+                } catch (InvalidValue $exception) {
+                    $this->fail($exception, $path);
                 }
             }
         }

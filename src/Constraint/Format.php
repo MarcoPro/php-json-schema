@@ -5,8 +5,7 @@ namespace Swaggest\JsonSchema\Constraint;
 class Format
 {
     const DATE_REGEX_PART = '(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])';
-    const TIME_REGEX_PART = '([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(\.[0-9]+)?' .
-    '(Z|(\+|-)([01][0-9]|2[0-3]):([0-5][0-9]))';
+    const TIME_REGEX_PART = '([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)([01][0-9]|2[0-3]):([0-5][0-9]))';
     const HOSTNAME_REGEX = '/^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9]){1,63}\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9]){1,63}$/i';
     const JSON_POINTER_REGEX = '_^(?:/|(?:/[^/#]*)*)$_';
     const JSON_POINTER_RELATIVE_REGEX = '~^(0|[1-9][0-9]*)((?:/[^/#]+)*)(#?)$~';
@@ -29,7 +28,7 @@ class Format
             case 'email':
                 return filter_var($data, FILTER_VALIDATE_EMAIL) ? null : 'Invalid email';
             case 'idn-email':
-                return filter_var($data, FILTER_VALIDATE_EMAIL) ? null : 'Invalid email';
+                return count(explode('@', $data, 3)) === 2 ? null : 'Invalid email';
             case 'ipv4':
                 return filter_var($data, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? null : 'Invalid ipv4';
             case 'ipv6':
@@ -37,7 +36,8 @@ class Format
             case 'hostname':
                 return preg_match(self::HOSTNAME_REGEX, $data) ? null : 'Invalid hostname';
             case 'idn-hostname':
-                return preg_match(self::HOSTNAME_REGEX, $data) ? null : 'Invalid hostname';
+                return ($data = self::idn($data)) && preg_match(self::HOSTNAME_REGEX, $data)
+                    ? null : 'Invalid hostname';
             case 'regex':
                 return self::regexError($data);
             case 'json-pointer':
@@ -50,6 +50,18 @@ class Format
                 return self::uriError($data, self::IS_URI_TEMPLATE);
         }
         return null;
+    }
+
+    public static function idn($data)
+    {
+        static $functionExists = null;
+        if ($functionExists === null) {
+            $functionExists = function_exists('idn_to_ascii');
+        }
+        if ($functionExists) {
+            $data = idn_to_ascii($data, 0, INTL_IDNA_VARIANT_UTS46);
+        }
+        return $data;
     }
 
     public static function dateTimeError($data)

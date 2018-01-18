@@ -152,6 +152,12 @@ class JsonSchema extends ClassStructure {
     /** @var JsonSchema */
     public $else;
 
+    /** @var string */
+    public $contentMediaType;
+
+    /** @var string */
+    public $contentEncoding;
+
 	/**
 	 * @param Properties|static $properties
 	 * @param JsonBasicSchema $ownerSchema
@@ -314,6 +320,9 @@ class JsonSchema extends ClassStructure {
         $properties->if = JsonBasicSchema::schema();
         $properties->then = JsonBasicSchema::schema();
         $properties->else = JsonBasicSchema::schema();
+
+        $properties->contentEncoding = JsonBasicSchema::string();
+        $properties->contentMediaType = JsonBasicSchema::string();
     }
 
 	/**

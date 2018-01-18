@@ -90,6 +90,7 @@ class Draft4Test extends \PHPUnit_Framework_TestCase
             $options = new Context();
             $options->setRemoteRefProvider($refProvider);
             $options->version = $version;
+            $options->strictBase64Validation = true;
 
             $schema = Schema::import($schemaData, $options);
 
@@ -102,7 +103,8 @@ class Draft4Test extends \PHPUnit_Framework_TestCase
             $error = $exception->getMessage();
         }
 
-        $this->assertSame($isValid, $actualValid, "Schema:\n" . json_encode($schemaData, JSON_PRETTY_PRINT)
+        $this->assertSame($isValid, $actualValid,
+            "Schema:\n" . json_encode($schemaData, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES)
             . "\nData:\n" . json_encode($data, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES)
             . "\nError: " . $error . "\n");
 
