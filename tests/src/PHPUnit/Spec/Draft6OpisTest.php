@@ -61,8 +61,10 @@ class Draft6OpisTest extends Draft6Test
 
         $actualValid = $result->isValid();
 
-        $this->assertSame($isValid, $actualValid, "Schema:\n" . json_encode($schemaData, JSON_PRETTY_PRINT)
-            . "\nData:\n" . json_encode($data, JSON_PRETTY_PRINT)
+        $this->assertSame($isValid, $actualValid,
+            "Test: $name\n"
+            . "Schema:\n" . json_encode($schemaData, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES)
+            . "\nData:\n" . json_encode($data, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES)
             . "\nError: " . $error . "\n");
 
     }

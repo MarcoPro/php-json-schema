@@ -41,14 +41,17 @@ class Draft4LeagueJsonGuardTest extends Draft4Test
         return $dereferencer;
     }
 
+    protected function skipTest($name)
+    {
+        static $skip = array(
+            // PHP Fatal error:  Maximum function nesting level of '256' reached, aborting!
+            'refRemote.json root ref in remote ref: string is valid' => true,
 
-    protected $skipTests = array(
-        // PHP Fatal error:  Maximum function nesting level of '256' reached, aborting!
-        'refRemote.json root ref in remote ref: string is valid' => true,
-
-        // PHP Fatal error:  Maximum function nesting level of '256' reached, aborting!
-        'refRemote.json root ref in remote ref: object is invalid' => true,
-    );
+            // PHP Fatal error:  Maximum function nesting level of '256' reached, aborting!
+            'refRemote.json root ref in remote ref: object is invalid' => true,
+        );
+        return isset($skip[$name]);
+    }
 
 
     /**
@@ -75,8 +78,10 @@ class Draft4LeagueJsonGuardTest extends Draft4Test
         }
 
 
-        $this->assertSame($isValid, $actualValid, "Schema:\n" . json_encode($schemaData, JSON_PRETTY_PRINT)
-            . "\nData:\n" . json_encode($data, JSON_PRETTY_PRINT)
+        $this->assertSame($isValid, $actualValid,
+            "Test: $name\n"
+            . "Schema:\n" . json_encode($schemaData, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES)
+            . "\nData:\n" . json_encode($data, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES)
             . "\nError: " . $error . "\n");
 
     }

@@ -47,15 +47,15 @@ class Draft4JustinrainbowsTest extends Draft4Test
      */
     protected function runSpecTest($schemaData, $data, $isValid, $name, $version)
     {
-        echo $name, "\n";
-
         $error = '';
         $validator = new Validator(self::getFactory());
         $validator->validate($data, $schemaData);
         $actualValid = $validator->isValid();
 
-        $this->assertSame($isValid, $actualValid, "Schema:\n" . json_encode($schemaData, JSON_PRETTY_PRINT)
-            . "\nData:\n" . json_encode($data, JSON_PRETTY_PRINT)
+        $this->assertSame($isValid, $actualValid,
+            "Test: $name\n"
+            . "Schema:\n" . json_encode($schemaData, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES)
+            . "\nData:\n" . json_encode($data, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES)
             . "\nError: " . $error . "\n");
 
     }

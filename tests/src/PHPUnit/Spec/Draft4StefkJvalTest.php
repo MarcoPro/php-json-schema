@@ -43,8 +43,10 @@ class Draft4StefkJvalTest extends Draft4Test
         $violations = $validator->validate($data, $schemaData);
         $actualValid = empty($violations);
 
-        $this->assertSame($isValid, $actualValid, "Schema:\n" . json_encode($schemaData, JSON_PRETTY_PRINT)
-            . "\nData:\n" . json_encode($data, JSON_PRETTY_PRINT)
+        $this->assertSame($isValid, $actualValid,
+            "Test: $name\n"
+            . "Schema:\n" . json_encode($schemaData, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES)
+            . "\nData:\n" . json_encode($data, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES)
             . "\nError: " . $error . "\n");
 
     }

@@ -314,7 +314,6 @@ class Schema extends JsonSchema implements MetaHolder
                 $validationError = Format::validationError($this->format, $data);
                 if ($validationError !== null) {
                     if ($this->format === "uri" && substr($path, -3) === ':id') {
-                        //echo 'A';
                     } else {
                         $this->fail(new StringException($validationError), $path);
                     }
