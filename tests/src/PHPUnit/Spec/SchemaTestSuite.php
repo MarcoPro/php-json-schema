@@ -84,6 +84,19 @@ abstract class SchemaTestSuite extends \PHPUnit_Framework_TestCase
                             */
 
                             $name = $entry . ' ' . $test->description . ': ' . $case->description;
+                            if (!isset($test->schema)) {
+                                if (isset($test->schemas)) {
+                                    foreach ($test->schemas as $i => $schema) {
+                                        $testCases[$name . '_' . $i] = array(
+                                            'schema' => $schema,
+                                            'data' => $case->data,
+                                            'isValid' => $case->valid,
+                                            'name' => $name,
+                                        );
+                                    }
+                                }
+                                continue;
+                            }
                             $testCases[$name] = array(
                                 'schema' => $test->schema,
                                 'data' => $case->data,
@@ -147,7 +160,7 @@ abstract class SchemaTestSuite extends \PHPUnit_Framework_TestCase
      */
     protected function runSpecTest($schemaData, $data, $isValid, $name, $version)
     {
-        $refProvider = self::getProvider();
+        $refProvider = static::getProvider();
 
         $actualValid = true;
         $error = '';
@@ -191,7 +204,7 @@ abstract class SchemaTestSuite extends \PHPUnit_Framework_TestCase
 
     private function runSpecTestSkipValidation($schemaData, $data, $isValid, $name)
     {
-        $refProvider = self::getProvider();
+        $refProvider = static::getProvider();
 
         $actualValid = true;
         $error = '';
@@ -223,6 +236,7 @@ abstract class SchemaTestSuite extends \PHPUnit_Framework_TestCase
 /**
  * @property $description
  * @property $schema
+ * @property $schemas
  * @property _SpecTestCase[] $tests
  */
 class _SpecTest

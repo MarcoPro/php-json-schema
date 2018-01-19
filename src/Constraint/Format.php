@@ -9,7 +9,7 @@ use Swaggest\JsonSchema\Constraint\Format\Uri;
 class Format
 {
     const DATE_REGEX_PART = '(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])';
-    const TIME_REGEX_PART = '([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)([01][0-9]|2[0-3]):([0-5][0-9]))';
+    const TIME_REGEX_PART = '([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)([01][0-9]|2[0-3]):([0-5][0-9]))?';
     /**
      * @see http://stackoverflow.com/a/1420225
      */
@@ -22,7 +22,7 @@ class Format
     $/ix';
 
     const JSON_POINTER_REGEX = '_^(?:/|(?:/[^/#]*)*)$_';
-    const JSON_POINTER_RELATIVE_REGEX = '~^(0|[1-9][0-9]*)((?:/[^/#]+)*)(#?)$~';
+    const JSON_POINTER_RELATIVE_REGEX = '~^(0|[1-9][0-9]*)((?:/[^/#]*)*)(#?)$~';
     const JSON_POINTER_UNESCAPED_TILDE = '/~([^01]|$)/';
 
     public static function validationError($format, $data)
@@ -31,9 +31,9 @@ class Format
             case 'date-time':
                 return self::dateTimeError($data);
             case 'date':
-                return preg_match('/^' . self::DATE_REGEX_PART . '/i', $data) ? null : 'Invalid date';
+                return preg_match('/^' . self::DATE_REGEX_PART . '$/i', $data) ? null : 'Invalid date';
             case 'time':
-                return preg_match('/^' . self::TIME_REGEX_PART . '/i', $data) ? null : 'Invalid time';
+                return preg_match('/^' . self::TIME_REGEX_PART . '$/i', $data) ? null : 'Invalid time';
             case 'uri':
                 return Uri::validationError($data, Uri::IS_SCHEME_REQUIRED);
             case 'iri':
@@ -82,7 +82,15 @@ class Format
             return 'Invalid regex: \A is not supported';
         }
 
-        return @preg_match('/' . $data . '/', '') === false ? 'Invalid regex' : null;
+
+        $d = null;
+        foreach (array('/', '_', '~', '#') as $delimiter) {
+            if (strpos($data, $delimiter) === false) {
+                $d = $delimiter;
+                break;
+            }
+        }
+        return @preg_match($d . $data . $d, '') === false ? 'Invalid regex: ' . $data : null;
     }
 
     public static function jsonPointerError($data, $isRelative = false)

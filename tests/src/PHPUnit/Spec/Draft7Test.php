@@ -9,6 +9,14 @@ class Draft7Test extends Draft4Test
 {
     const SCHEMA_VERSION = Schema::VERSION_DRAFT_07;
 
+    protected function skipTest($name)
+    {
+        static $skip = array(
+            'iri.json validation of IRIs: a valid IRI based on IPv6' => 1,
+        );
+        return isset($skip[$name]);
+    }
+
     public function specProvider()
     {
         $path = __DIR__ . '/../../../../spec/JSON-Schema-Test-Suite/tests/draft7';
@@ -26,14 +34,6 @@ class Draft7Test extends Draft4Test
     {
         $path = __DIR__ . '/../../../../spec/JSON-Schema-Test-Suite/tests/draft7/optional/format';
         return $this->provider($path);
-    }
-
-    protected function skipTest($name)
-    {
-        static $skip = array(
-            'iri.json validation of IRIs: a valid IRI based on IPv6' => 1,
-        );
-        return isset($skip[$name]);
     }
 
     /**
