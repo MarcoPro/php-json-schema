@@ -175,7 +175,11 @@ abstract class SchemaTestSuite extends \PHPUnit_Framework_TestCase
             $res = $schema->in($data, $options);
 
             $exported = $schema->out($res);
-            $this->assertEquals($data, $exported);
+
+            $res = $schema->in($exported, $options);
+            $exported2 = $schema->out($res);
+
+            $this->assertEquals($exported2, $exported, $name);
         } catch (InvalidValue $exception) {
             $actualValid = false;
             $error = $exception->getMessage();

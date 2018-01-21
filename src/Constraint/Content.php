@@ -43,9 +43,10 @@ class Content
                 switch ($mediaType) {
                     case self::MEDIA_TYPE_APPLICATION_JSON:
                         $data = json_decode($data);
-                        $lastError = json_last_error_msg();
-                        if ($lastError !== 'No error') {
-                            throw new ContentException('Unable to decode json: ' . $lastError);
+                        $lastErrorCode = json_last_error();
+                        if ($lastErrorCode !== JSON_ERROR_NONE) {
+                            // TODO add readable error message
+                            throw new ContentException('Unable to decode json, err code: ' . $lastErrorCode);
                         }
                         break;
 
@@ -60,9 +61,10 @@ class Content
                 switch ($mediaType) {
                     case self::MEDIA_TYPE_APPLICATION_JSON:
                         $data = json_encode($data);
-                        $lastError = json_last_error_msg();
-                        if ($lastError !== 'No error') {
-                            throw new ContentException('Unable to encode json: ' . $lastError);
+                        $lastErrorCode = json_last_error();
+                        if ($lastErrorCode !== JSON_ERROR_NONE) {
+                            // TODO add readable error message
+                            throw new ContentException('Unable to encode json, err code: ' . $lastErrorCode);
                         }
                         break;
                 }

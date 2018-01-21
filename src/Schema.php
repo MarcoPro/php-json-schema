@@ -325,14 +325,6 @@ class Schema extends JsonSchema implements MetaHolder
                     }
                 }
             }
-            // TODO enable content decoding/encoding with import/export
-            if ($this->contentEncoding !== null || $this->contentMediaType !== null) {
-                try {
-                    Content::process($options, $this->contentEncoding, $this->contentMediaType, $data, true);
-                } catch (InvalidValue $exception) {
-                    $this->fail($exception, $path);
-                }
-            }
         }
 
         if (is_int($data) || is_float($data)) {
@@ -812,6 +804,18 @@ class Schema extends JsonSchema implements MetaHolder
                 if (!$containsOk) {
                     $this->fail(new ArrayException('Array fails contains constraint'), $path);
                 }
+            }
+        }
+
+        if ($this->contentEncoding !== null || $this->contentMediaType !== null) {
+            try {
+                if ($options->unpackContentMediaType) {
+                    $result = Content::process($options, $this->contentEncoding, $this->contentMediaType, $data, $import);
+                } else {
+                    Content::process($options, $this->contentEncoding, $this->contentMediaType, $data, true);
+                }
+            } catch (InvalidValue $exception) {
+                $this->fail($exception, $path);
             }
         }
 
