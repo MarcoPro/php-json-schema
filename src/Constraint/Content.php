@@ -15,9 +15,9 @@ class Content
 
     /**
      * @param Context $options
-     * @param $encoding
-     * @param $mediaType
-     * @param $data
+     * @param string|null $encoding
+     * @param string|null $mediaType
+     * @param string $data
      * @param bool $import
      * @return bool|mixed|string
      * @throws ContentException

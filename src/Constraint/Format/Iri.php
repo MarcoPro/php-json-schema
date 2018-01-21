@@ -2,13 +2,11 @@
 
 namespace Swaggest\JsonSchema\Constraint\Format;
 
-use Swaggest\JsonSchema\Constraint\Format;
-
 class Iri
 {
 
     /**
-     * @param $data
+     * @param string $data
      * @param int $options
      * @return null|string
      */
@@ -26,7 +24,8 @@ class Iri
     /**
      * @see http://www.unicode.org/faq/idn.html
      * @see https://gist.github.com/rxu/0660eef7a2f9e7992db6
-     * @param $data
+     * @param string $data
+     * @param string $sanitized
      * @return null|string
      */
     public static function unicodeValidationError($data, &$sanitized = null)
@@ -673,8 +672,8 @@ class Iri
 
     /**
      * @see https://stackoverflow.com/a/14366023/329463
-     * @param $string
-     * @param $pointer
+     * @param string $string
+     * @param int $pointer
      * @return bool|string
      */
     private static function unicodeNextChar($string, &$pointer)

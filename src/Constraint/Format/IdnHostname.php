@@ -9,7 +9,7 @@ class IdnHostname
     /**
      * @see http://www.unicode.org/faq/idn.html
      * @see https://gist.github.com/rxu/0660eef7a2f9e7992db6
-     * @param $data
+     * @param string $data
      * @return null|string
      */
     public static function validationError($data)

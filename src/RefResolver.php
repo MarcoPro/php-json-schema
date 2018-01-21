@@ -85,7 +85,7 @@ class RefResolver
     /** @var Ref[] */
     private $refs = array();
 
-    /** @var RefResolver[] */
+    /** @var RefResolver[]|null[] */
     private $remoteRefResolvers = array();
 
     /** @var RemoteRefProvider */
