@@ -44,6 +44,7 @@ class Schema extends JsonSchema implements MetaHolder
 
     const REF = '$ref';
     const ID = '$id';
+    const ID_D4 = 'id';
 
 
     /*
@@ -119,11 +120,11 @@ class Schema extends JsonSchema implements MetaHolder
         } elseif ($data instanceof \stdClass) {
             /** @var JsonSchema $data */
             if (
-                isset($data->id)
-                && is_string($data->id)
-                && ($options->version === self::VERSION_DRAFT_04 || $options->version === self::VERSION_AUTO)
+                isset($data->{Schema::ID_D4})
+                && is_string($data->{Schema::ID_D4})
+                && (($options->version === self::VERSION_AUTO) || $options->version === self::VERSION_DRAFT_04)
             ) {
-                $prev = $options->refResolver->setupResolutionScope($data->id, $data);
+                $prev = $options->refResolver->setupResolutionScope($data->{Schema::ID_D4}, $data);
                 /** @noinspection PhpUnusedLocalVariableInspection */
                 $_ = new ScopeExit(function () use ($prev, $options) {
                     $options->refResolver->setResolutionScope($prev);
@@ -132,7 +133,7 @@ class Schema extends JsonSchema implements MetaHolder
 
             if (isset($data->{self::ID})
                 && is_string($data->{self::ID})
-                && ($options->version >= self::VERSION_DRAFT_06 || $options->version === self::VERSION_AUTO)
+                && (($options->version === self::VERSION_AUTO) || $options->version >= self::VERSION_DRAFT_06)
             ) {
                 $prev = $options->refResolver->setupResolutionScope($data->{self::ID}, $data);
                 /** @noinspection PhpUnusedLocalVariableInspection */
@@ -563,10 +564,10 @@ class Schema extends JsonSchema implements MetaHolder
             // @todo better check for schema id
 
             if ($import
-                && isset($data->id)
+                && isset($data->{Schema::ID_D4})
                 && ($options->version === Schema::VERSION_DRAFT_04 || $options->version === Schema::VERSION_AUTO)
-                && is_string($data->id) /*&& (!isset($this->properties['id']))/* && $this->isMetaSchema($data)*/) {
-                $id = $data->id;
+                && is_string($data->{Schema::ID_D4}) /*&& (!isset($this->properties['id']))/* && $this->isMetaSchema($data)*/) {
+                $id = $data->{Schema::ID_D4};
                 $refResolver = $options->refResolver;
                 $parentScope = $refResolver->updateResolutionScope($id);
                 /** @noinspection PhpUnusedLocalVariableInspection */

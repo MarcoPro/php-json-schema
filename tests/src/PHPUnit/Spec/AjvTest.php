@@ -4,9 +4,11 @@ namespace Swaggest\JsonSchema\Tests\PHPUnit\Spec;
 
 
 use Swaggest\JsonSchema\RemoteRef\Preloaded;
+use Swaggest\JsonSchema\Schema;
 
 class AjvTest extends SchemaTestSuite
 {
+    const SCHEMA_VERSION = Schema::VERSION_AUTO;
 
     public static function getProvider()
     {
@@ -57,6 +59,10 @@ class AjvTest extends SchemaTestSuite
             'format.json validation of JSON-pointer URI fragment strings: not a valid JSON-pointer as uri fragment (% not URL-encoded)' => 1,
             'format.json validation of URL strings: an invalid URL string' => 1,
         );
+
+        // debug particular test
+        //return '1_ids_in_refs.json IDs in refs without root id (#1): valid' !== $name;
+
         return isset($skip[$name]);
     }
 
@@ -120,13 +126,11 @@ class AjvTest extends SchemaTestSuite
         $this->runSpecTest($schemaData, $data, $isValid, $name, static::SCHEMA_VERSION);
     }
 
-    /*
     public function specDataProvider()
     {
         $path = __DIR__ . '/../../../../spec/ajv/spec/extras/$data';
         return $this->provider($path);
     }
-    */
 
     /**
      * @dataProvider specDataProvider
@@ -139,6 +143,7 @@ class AjvTest extends SchemaTestSuite
     /*
     public function testSpecData($schemaData, $data, $isValid, $name)
     {
+        $this->markTestSkipped();
         if ($this->skipTest($name)) {
             $this->markTestSkipped();
             return;
