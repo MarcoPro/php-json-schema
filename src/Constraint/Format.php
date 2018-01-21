@@ -84,7 +84,7 @@ class Format
 
 
         $d = null;
-        foreach (array('/', '_', '~', '#') as $delimiter) {
+        foreach (array('/', '_', '~', '#', '!', '%', '`', '=') as $delimiter) {
             if (strpos($data, $delimiter) === false) {
                 $d = $delimiter;
                 break;

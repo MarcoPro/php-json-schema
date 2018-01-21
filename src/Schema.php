@@ -151,6 +151,11 @@ class Schema extends JsonSchema implements MetaHolder
 
     public static function import($data, Context $options = null)
     {
+        // string $data is expected to be $ref uri
+        if (is_string($data)) {
+            $data = (object)array(self::REF => $data);
+        }
+
         $data = self::unboolSchemaData($data);
         return parent::import($data, $options);
     }
@@ -527,6 +532,34 @@ class Schema extends JsonSchema implements MetaHolder
                 }
             }
 
+            // @todo better check for schema id
+
+            if ($import
+                && isset($data->{Schema::ID_D4})
+                && ($options->version === Schema::VERSION_DRAFT_04 || $options->version === Schema::VERSION_AUTO)
+                && is_string($data->{Schema::ID_D4}) /*&& (!isset($this->properties['id']))/* && $this->isMetaSchema($data)*/) {
+                $id = $data->{Schema::ID_D4};
+                $refResolver = $options->refResolver;
+                $parentScope = $refResolver->updateResolutionScope($id);
+                /** @noinspection PhpUnusedLocalVariableInspection */
+                $defer = new ScopeExit(function () use ($parentScope, $refResolver) {
+                    $refResolver->setResolutionScope($parentScope);
+                });
+            }
+
+            if ($import
+                && isset($data->{self::ID})
+                && ($options->version >= Schema::VERSION_DRAFT_06 || $options->version === Schema::VERSION_AUTO)
+                && is_string($data->{self::ID}) /*&& (!isset($this->properties['id']))/* && $this->isMetaSchema($data)*/) {
+                $id = $data->{self::ID};
+                $refResolver = $options->refResolver;
+                $parentScope = $refResolver->updateResolutionScope($id);
+                /** @noinspection PhpUnusedLocalVariableInspection */
+                $defer = new ScopeExit(function () use ($parentScope, $refResolver) {
+                    $refResolver->setResolutionScope($parentScope);
+                });
+            }
+
             if ($import) {
                 try {
                     while (
@@ -559,34 +592,6 @@ class Schema extends JsonSchema implements MetaHolder
                 } catch (InvalidValue $exception) {
                     $this->fail($exception, $path);
                 }
-            }
-
-            // @todo better check for schema id
-
-            if ($import
-                && isset($data->{Schema::ID_D4})
-                && ($options->version === Schema::VERSION_DRAFT_04 || $options->version === Schema::VERSION_AUTO)
-                && is_string($data->{Schema::ID_D4}) /*&& (!isset($this->properties['id']))/* && $this->isMetaSchema($data)*/) {
-                $id = $data->{Schema::ID_D4};
-                $refResolver = $options->refResolver;
-                $parentScope = $refResolver->updateResolutionScope($id);
-                /** @noinspection PhpUnusedLocalVariableInspection */
-                $defer = new ScopeExit(function () use ($parentScope, $refResolver) {
-                    $refResolver->setResolutionScope($parentScope);
-                });
-            }
-
-            if ($import
-                && isset($data->{self::ID})
-                && ($options->version >= Schema::VERSION_DRAFT_06 || $options->version === Schema::VERSION_AUTO)
-                && is_string($data->{self::ID}) /*&& (!isset($this->properties['id']))/* && $this->isMetaSchema($data)*/) {
-                $id = $data->{self::ID};
-                $refResolver = $options->refResolver;
-                $parentScope = $refResolver->updateResolutionScope($id);
-                /** @noinspection PhpUnusedLocalVariableInspection */
-                $defer = new ScopeExit(function () use ($parentScope, $refResolver) {
-                    $refResolver->setResolutionScope($parentScope);
-                });
             }
 
             /** @var Schema[] $properties */

@@ -91,6 +91,17 @@ JSON
 )); // Exception: Required property missing: id at #->properties:orders->items[1]->#/definitions/order
 ```
 
+You can also call `Schema::import` on string `uri` to schema json data.
+```php
+$schema = Schema::import('http://localhost:1234/my_schema.json');
+```
+
+Or with boolean argument.
+```php
+$schema = Schema::import(true); // permissive schema, always validates
+$schema = Schema::import(false); // restrictive schema, always invalidates
+```
+
 ### PHP structured classes with validation
 
 ```php
@@ -409,3 +420,13 @@ $schema = SwaggerSchema::schema()->in(json_decode(
 ), $context);
 $this->assertInstanceOf(CustomSchema::className(), $schema->definitions['User']);
 ```
+
+## Code quality and test coverage
+
+Some code quality best practices are intentionally violated here 
+(see [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/swaggest/php-json-schema/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/swaggest/php-json-schema/?branch=master)
+) to allow best performance at maintenance cost.
+
+Those violations are secured by comprehensive test coverage:
+ * draft-04, draft-06, draft-07 of [JSON-Schema-Test-Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite)
+ * test cases (excluding `$data` and few tests) of [epoberezkin/ajv](https://github.com/epoberezkin/ajv/tree/master/spec) (a mature js implementation)

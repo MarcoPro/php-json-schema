@@ -58,10 +58,11 @@ class AjvTest extends SchemaTestSuite
             'format.json validation of uuid strings: not valid uuid' => 1,
             'format.json validation of JSON-pointer URI fragment strings: not a valid JSON-pointer as uri fragment (% not URL-encoded)' => 1,
             'format.json validation of URL strings: an invalid URL string' => 1,
+            '62_resolution_scope_change.json change resolution scope - change filename (#62): string is valid' => 1,
         );
 
         // debug particular test
-        //return '1_ids_in_refs.json IDs in refs without root id (#1): valid' !== $name;
+        //return '1_ids_in_refs.json IDs in refs with root id: valid' !== $name;
 
         return isset($skip[$name]);
     }
